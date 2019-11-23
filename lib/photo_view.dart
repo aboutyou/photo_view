@@ -3,7 +3,6 @@ library photo_view;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
@@ -244,6 +243,7 @@ class PhotoView extends StatefulWidget {
     this.customSize,
     this.gestureDetectorBehavior,
     this.tightMode,
+    this.enableDoubleTap = true,
   })  : child = null,
         childSize = null,
         super(key: key);
@@ -274,6 +274,7 @@ class PhotoView extends StatefulWidget {
     this.customSize,
     this.gestureDetectorBehavior,
     this.tightMode,
+    this.enableDoubleTap = true,
   })  : loadingChild = null,
         imageProvider = null,
         gaplessPlayback = false,
@@ -339,7 +340,9 @@ class PhotoView extends StatefulWidget {
   /// The alignment of the scale origin in relation to the widget size. Default is [Alignment.center]
   final Alignment basePosition;
 
-  /// Defines de next [PhotoViewScaleState] given the actual one. Default is [defaultScaleStateCycle]
+  /// Defines the next [PhotoViewScaleState] given the actual one. Default is
+  /// [defaultScaleStateCycle].
+  /// Only used when [enableDoubleTap] is `true`.
   final ScaleStateCycle scaleStateCycle;
 
   /// A pointer that will trigger a tap has stopped contacting the screen at a
@@ -356,6 +359,10 @@ class PhotoView extends StatefulWidget {
   /// Enables tight mode, making background container assume the size of the image/child.
   /// Useful when inside a [Dialog]
   final bool tightMode;
+
+  /// Enables the double tap gesture to cycle through the scale state defined
+  /// by the [scaleStateCycle].
+  final bool enableDoubleTap;
 
   @override
   State<StatefulWidget> createState() {
@@ -516,6 +523,7 @@ class _PhotoViewState extends State<PhotoView> {
       onTapDown: widget.onTapDown,
       gestureDetectorBehavior: widget.gestureDetectorBehavior,
       tightMode: widget.tightMode ?? false,
+      enableDoubleTap: widget.enableDoubleTap ?? true,
     );
   }
 
@@ -570,6 +578,7 @@ class _PhotoViewState extends State<PhotoView> {
       onTapDown: widget.onTapDown,
       gestureDetectorBehavior: widget.gestureDetectorBehavior,
       tightMode: widget.tightMode ?? false,
+      enableDoubleTap: widget.enableDoubleTap ?? true,
     );
   }
 
