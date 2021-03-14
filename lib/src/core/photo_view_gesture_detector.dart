@@ -5,7 +5,7 @@ import 'photo_view_hit_corners.dart';
 
 class PhotoViewGestureDetector extends StatelessWidget {
   const PhotoViewGestureDetector({
-    Key key,
+    Key? key,
     this.hitDetector,
     this.onScaleStart,
     this.onScaleUpdate,
@@ -17,25 +17,25 @@ class PhotoViewGestureDetector extends StatelessWidget {
     this.behavior,
   }) : super(key: key);
 
-  final GestureDoubleTapCallback onDoubleTap;
-  final HitCornersDetector hitDetector;
+  final GestureDoubleTapCallback? onDoubleTap;
+  final HitCornersDetector? hitDetector;
 
-  final GestureScaleStartCallback onScaleStart;
-  final GestureScaleUpdateCallback onScaleUpdate;
-  final GestureScaleEndCallback onScaleEnd;
+  final GestureScaleStartCallback? onScaleStart;
+  final GestureScaleUpdateCallback? onScaleUpdate;
+  final GestureScaleEndCallback? onScaleEnd;
 
-  final GestureTapUpCallback onTapUp;
-  final GestureTapDownCallback onTapDown;
+  final GestureTapUpCallback? onTapUp;
+  final GestureTapDownCallback? onTapDown;
 
-  final Widget child;
+  final Widget? child;
 
-  final HitTestBehavior behavior;
+  final HitTestBehavior? behavior;
 
   @override
   Widget build(BuildContext context) {
     final scope = PhotoViewGestureDetectorScope.of(context);
 
-    final Axis axis = scope?.axis;
+    final Axis? axis = scope?.axis;
 
     final Map<Type, GestureRecognizerFactory> gestures =
         <Type, GestureRecognizerFactory>{};
@@ -52,17 +52,6 @@ class PhotoViewGestureDetector extends StatelessWidget {
       );
     }
 
-    gestures[PhotoViewGestureRecognizer] =
-        GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
-      () => PhotoViewGestureRecognizer(hitDetector, this, axis),
-      (PhotoViewGestureRecognizer instance) {
-        instance
-          ..onStart = onScaleStart
-          ..onUpdate = onScaleUpdate
-          ..onEnd = onScaleEnd;
-      },
-    );
-
     gestures[DoubleTapGestureRecognizer] =
         GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
       () => DoubleTapGestureRecognizer(debugOwner: this),
@@ -71,8 +60,20 @@ class PhotoViewGestureDetector extends StatelessWidget {
       },
     );
 
+    gestures[PhotoViewGestureRecognizer] =
+        GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
+      () => PhotoViewGestureRecognizer(
+          hitDetector: hitDetector, debugOwner: this, validateAxis: axis),
+      (PhotoViewGestureRecognizer instance) {
+        instance
+          ..onStart = onScaleStart
+          ..onUpdate = onScaleUpdate
+          ..onEnd = onScaleEnd;
+      },
+    );
+
     return RawGestureDetector(
-      behavior: behavior ?? HitTestBehavior.translucent,
+      behavior: behavior,
       child: child,
       gestures: gestures,
     );
@@ -80,18 +81,19 @@ class PhotoViewGestureDetector extends StatelessWidget {
 }
 
 class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
-  PhotoViewGestureRecognizer(
+  PhotoViewGestureRecognizer({
     this.hitDetector,
-    Object debugOwner,
+    Object? debugOwner,
     this.validateAxis,
-  ) : super(debugOwner: debugOwner);
-  final HitCornersDetector hitDetector;
-  final Axis validateAxis;
+    PointerDeviceKind? kind,
+  }) : super(debugOwner: debugOwner, kind: kind);
+  final HitCornersDetector? hitDetector;
+  final Axis? validateAxis;
 
   Map<int, Offset> _pointerLocations = <int, Offset>{};
 
-  Offset _initialFocalPoint;
-  Offset _currentFocalPoint;
+  Offset? _initialFocalPoint;
+  Offset? _currentFocalPoint;
 
   bool ready = true;
 
@@ -138,7 +140,7 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     final int count = _pointerLocations.keys.length;
     Offset focalPoint = Offset.zero;
     for (int pointer in _pointerLocations.keys)
-      focalPoint += _pointerLocations[pointer];
+      focalPoint += _pointerLocations[pointer]!;
     _currentFocalPoint =
         count > 0 ? focalPoint / count.toDouble() : Offset.zero;
   }
@@ -147,17 +149,15 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     if (!(event is PointerMoveEvent)) {
       return;
     }
-    final move = _initialFocalPoint - _currentFocalPoint;
-    final bool shouldMove = validateAxis == Axis.vertical
-        ? hitDetector.shouldMoveY(move)
-        : hitDetector.shouldMoveX(move);
+    final move = _initialFocalPoint! - _currentFocalPoint!;
+    final bool shouldMove = hitDetector!.shouldMove(move, validateAxis!);
     if (shouldMove || _pointerLocations.keys.length > 1) {
-      resolve(GestureDisposition.accepted);
+      acceptGesture(event.pointer);
     }
   }
 }
 
-/// An [InheritedWidget] responsible to give a axis aware scope to the internal[GestureRecognizer].
+/// An [InheritedWidget] responsible to give a axis aware scope to [PhotoViewGestureRecognizer].
 ///
 /// When using this, PhotoView will test if the content zoomed has hit edge every time user pinches,
 /// if so, it will let parent gesture detectors win the gesture arena
@@ -177,16 +177,16 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
 class PhotoViewGestureDetectorScope extends InheritedWidget {
   PhotoViewGestureDetectorScope({
     this.axis,
-    @required Widget child,
+    required Widget child,
   }) : super(child: child);
 
-  static PhotoViewGestureDetectorScope of(BuildContext context) {
-    final PhotoViewGestureDetectorScope scope =
-        context.inheritFromWidgetOfExactType(PhotoViewGestureDetectorScope);
+  static PhotoViewGestureDetectorScope? of(BuildContext context) {
+    final PhotoViewGestureDetectorScope? scope = context
+        .dependOnInheritedWidgetOfExactType<PhotoViewGestureDetectorScope>();
     return scope;
   }
 
-  final Axis axis;
+  final Axis? axis;
 
   @override
   bool updateShouldNotify(PhotoViewGestureDetectorScope oldWidget) {
