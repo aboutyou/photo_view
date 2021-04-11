@@ -560,7 +560,11 @@ class _PhotoViewState extends State<PhotoView>
 PhotoViewScaleState defaultScaleStateCycle(PhotoViewScaleState actual) {
   switch (actual) {
     case PhotoViewScaleState.initial:
-      return PhotoViewScaleState.covering;
+      return PhotoViewScaleState.zoomOne;
+    case PhotoViewScaleState.zoomOne:
+      return PhotoViewScaleState.zoomTwo;
+    case PhotoViewScaleState.zoomTwo:
+      return PhotoViewScaleState.initial;
     case PhotoViewScaleState.covering:
       return PhotoViewScaleState.originalSize;
     case PhotoViewScaleState.originalSize:

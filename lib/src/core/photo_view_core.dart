@@ -314,35 +314,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
               ..scale(computedScale)
               ..rotateZ(value.rotation);
 
-            final Widget customChildLayout = CustomSingleChildLayout(
-              delegate: _CenterWithOriginalSizeDelegate(
-                scaleBoundaries.childSize,
-                basePosition,
-                useImageScale,
-              ),
-              child: _buildHero(),
-            );
-
-            final child = Container(
-              constraints: widget.tightMode
-                  ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
-                  : null,
-              child: Center(
-                child: Transform(
-                  child: customChildLayout,
-                  transform: matrix,
-                  alignment: basePosition,
-                ),
-              ),
-              decoration: widget.backgroundDecoration ?? _defaultDecoration,
-            );
-
-            if (widget.disableGestures) {
-              return child;
-            }
-
-            return PhotoViewGestureDetector(
-              child: child,
+            final Widget customChildLayout = PhotoViewGestureDetector(
               onDoubleTap: nextScaleState,
               onScaleStart: onScaleStart,
               onScaleUpdate: onScaleUpdate,
@@ -354,6 +326,28 @@ class PhotoViewCoreState extends State<PhotoViewCore>
               onTapDown: widget.onTapDown != null
                   ? (details) => widget.onTapDown!(context, details, value)
                   : null,
+              child: CustomSingleChildLayout(
+                delegate: _CenterWithOriginalSizeDelegate(
+                  scaleBoundaries.childSize,
+                  basePosition,
+                  useImageScale,
+                ),
+                child: _buildHero(),
+              ),
+            );
+
+            return Container(
+              constraints: widget.tightMode
+                  ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
+                  : null,
+              child: Center(
+                child: Transform(
+                  child: customChildLayout,
+                  transform: matrix,
+                  alignment: basePosition,
+                ),
+              ),
+              decoration: widget.backgroundDecoration ?? _defaultDecoration,
             );
           } else {
             return Container();
