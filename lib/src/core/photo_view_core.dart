@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-
 import 'package:photo_view/photo_view.dart'
     show
         PhotoViewScaleState,
@@ -10,9 +9,9 @@ import 'package:photo_view/photo_view.dart'
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
-import 'package:photo_view/src/utils/photo_view_utils.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
 import 'package:photo_view/src/core/photo_view_hit_corners.dart';
+import 'package:photo_view/src/utils/photo_view_utils.dart';
 
 const _defaultDecoration = const BoxDecoration(
   color: const Color.fromRGBO(0, 0, 0, 1.0),
@@ -303,35 +302,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
               ..scale(computedScale)
               ..rotateZ(value.rotation);
 
-            final Widget customChildLayout = CustomSingleChildLayout(
-              delegate: _CenterWithOriginalSizeDelegate(
-                scaleBoundaries.childSize,
-                basePosition,
-                useImageScale,
-              ),
-              child: _buildHero(),
-            );
-
-            final child = Container(
-              constraints: widget.tightMode
-                  ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
-                  : null,
-              child: Center(
-                child: Transform(
-                  child: customChildLayout,
-                  transform: matrix,
-                  alignment: basePosition,
-                ),
-              ),
-              decoration: widget.backgroundDecoration ?? _defaultDecoration,
-            );
-
-            if (widget.disableGestures) {
-              return child;
-            }
-
-            return PhotoViewGestureDetector(
-              child: child,
+            final Widget customChildLayout = PhotoViewGestureDetector(
               onDoubleTap: nextScaleState,
               onScaleStart: onScaleStart,
               onScaleUpdate: onScaleUpdate,
@@ -343,6 +314,28 @@ class PhotoViewCoreState extends State<PhotoViewCore>
               onTapDown: widget.onTapDown != null
                   ? (details) => widget.onTapDown!(context, details, value)
                   : null,
+              child: CustomSingleChildLayout(
+                delegate: _CenterWithOriginalSizeDelegate(
+                  scaleBoundaries.childSize,
+                  basePosition,
+                  useImageScale,
+                ),
+                child: _buildHero(),
+              ),
+            );
+
+            return Container(
+              constraints: widget.tightMode
+                  ? BoxConstraints.tight(scaleBoundaries.childSize * scale)
+                  : null,
+              child: Center(
+                child: Transform(
+                  child: customChildLayout,
+                  transform: matrix,
+                  alignment: basePosition,
+                ),
+              ),
+              decoration: widget.backgroundDecoration ?? _defaultDecoration,
             );
           } else {
             return Container();

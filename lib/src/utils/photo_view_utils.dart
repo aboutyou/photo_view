@@ -21,6 +21,13 @@ double getScaleForScaleState(
           scaleBoundaries);
     case PhotoViewScaleState.originalSize:
       return _clampSize(1.0, scaleBoundaries);
+    case PhotoViewScaleState.zoomOne:
+      return _clampSize(
+        (scaleBoundaries.initialScale + scaleBoundaries.maxScale) / 2,
+        scaleBoundaries,
+      );
+    case PhotoViewScaleState.zoomTwo:
+      return _clampSize(scaleBoundaries.maxScale, scaleBoundaries);
     // Will never be reached
     default:
       return 0;

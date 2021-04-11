@@ -5,6 +5,8 @@ enum PhotoViewScaleState {
   originalSize,
   zoomedIn,
   zoomedOut,
+  zoomOne,
+  zoomTwo,
 }
 
 extension PhotoViewScaleStateIZoomingExtension on PhotoViewScaleState {
