@@ -85,8 +85,7 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     this.hitDetector,
     Object? debugOwner,
     this.validateAxis,
-    PointerDeviceKind? kind,
-  }) : super(debugOwner: debugOwner, kind: kind);
+  }) : super(debugOwner: debugOwner);
   final HitCornersDetector? hitDetector;
   final Axis? validateAxis;
 
@@ -98,7 +97,7 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
   bool ready = true;
 
   @override
-  void addAllowedPointer(PointerEvent event) {
+  void addAllowedPointer(PointerDownEvent event) {
     if (ready) {
       ready = false;
       _pointerLocations = <int, Offset>{};
