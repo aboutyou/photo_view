@@ -7,7 +7,11 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
+<<<<<<< HEAD
     version: "2.8.2"
+=======
+    version: "2.8.1"
+>>>>>>> 56f6c99 (Upgrade to flutter 2.5)
   boolean_selector:
     dependency: transitive
     description:
@@ -169,7 +173,11 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
+<<<<<<< HEAD
     version: "0.4.8"
+=======
+    version: "0.4.2"
+>>>>>>> 56f6c99 (Upgrade to flutter 2.5)
   typed_data:
     dependency: transitive
     description:
