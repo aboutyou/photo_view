@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/widgets.dart';
 import 'package:photo_view/photo_view.dart'
     show
@@ -7,8 +5,6 @@ import 'package:photo_view/photo_view.dart'
         PhotoViewScaleState,
         PhotoViewScaleStateController,
         ScaleStateCycle;
-import 'package:photo_view/src/controller/photo_view_controller.dart';
-import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
 import 'package:photo_view/src/photo_view_scale_state.dart';
 import 'package:photo_view/src/utils/photo_view_utils.dart';
@@ -66,7 +62,9 @@ mixin PhotoViewControllerDelegate on State<PhotoViewCore> {
   }
 
   void _blindScaleListener() {
-    controller.position = clampPosition();
+    if (!widget.enablePanAlways) {
+      controller.position = clampPosition();
+    }
     if (controller.scale == controller.prevValue.scale) {
       return;
     }

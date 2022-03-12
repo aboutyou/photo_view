@@ -85,7 +85,8 @@ class PhotoViewGestureRecognizer extends ScaleGestureRecognizer {
     this.hitDetector,
     Object? debugOwner,
     this.validateAxis,
-  }) : super(debugOwner: debugOwner);
+    Set<PointerDeviceKind>? supportedDevices,
+  }) : super(debugOwner: debugOwner, supportedDevices: supportedDevices);
   final HitCornersDetector? hitDetector;
   final Axis? validateAxis;
 

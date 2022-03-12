@@ -5,6 +5,7 @@ import 'package:photo_view/photo_view.dart'
         PhotoViewHeroAttributes,
         PhotoViewImageTapDownCallback,
         PhotoViewImageTapUpCallback,
+        PhotoViewImageScaleEndCallback,
         ScaleStateCycle;
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_controller_delegate.dart';
@@ -29,6 +30,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.enableRotation,
     required this.onTapUp,
     required this.onTapDown,
+    required this.onScaleEnd,
     required this.gestureDetectorBehavior,
     required this.controller,
     required this.scaleBoundaries,
@@ -38,6 +40,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.tightMode,
     required this.filterQuality,
     required this.disableGestures,
+    required this.enablePanAlways,
   })  : customChild = null,
         super(key: key);
 
@@ -49,6 +52,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.enableRotation,
     this.onTapUp,
     this.onTapDown,
+    this.onScaleEnd,
     this.gestureDetectorBehavior,
     required this.controller,
     required this.scaleBoundaries,
@@ -58,6 +62,7 @@ class PhotoViewCore extends StatefulWidget {
     required this.tightMode,
     required this.filterQuality,
     required this.disableGestures,
+    required this.enablePanAlways,
   })  : imageProvider = null,
         gaplessPlayback = false,
         super(key: key);
@@ -77,10 +82,12 @@ class PhotoViewCore extends StatefulWidget {
 
   final PhotoViewImageTapUpCallback? onTapUp;
   final PhotoViewImageTapDownCallback? onTapDown;
+  final PhotoViewImageScaleEndCallback? onScaleEnd;
 
   final HitTestBehavior? gestureDetectorBehavior;
   final bool tightMode;
   final bool disableGestures;
+  final bool enablePanAlways;
 
   final FilterQuality filterQuality;
 
@@ -101,14 +108,10 @@ class PhotoViewCoreState extends State<PhotoViewCore>
   double? _scaleBefore;
   double? _rotationBefore;
 
-  late final AnimationController _scaleAnimationController =
-      AnimationController(vsync: this)
-        ..addListener(handleScaleAnimation)
-        ..addStatusListener(onAnimationStatus);
+  late final AnimationController _scaleAnimationController;
   Animation<double>? _scaleAnimation;
 
-  late final AnimationController _positionAnimationController =
-      AnimationController(vsync: this)..addListener(handlePositionAnimate);
+  late final AnimationController _positionAnimationController;
   Animation<Offset>? _positionAnimation;
 
   late final AnimationController _rotationAnimationController =
@@ -146,10 +149,11 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
     updateScaleStateFromNewScale(newScale);
 
-    //
     updateMultiple(
       scale: newScale,
-      position: clampPosition(position: delta * details.scale),
+      position: widget.enablePanAlways
+          ? delta
+          : clampPosition(position: delta * details.scale),
       rotation:
           widget.enableRotation ? _rotationBefore! + details.rotation : null,
       rotationFocusPoint: widget.enableRotation ? details.focalPoint : null,
@@ -161,6 +165,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     final Offset _position = controller.position;
     final double maxScale = scaleBoundaries.maxScale;
     final double minScale = scaleBoundaries.minScale;
+
+    widget.onScaleEnd?.call(context, details, controller.value);
 
     //animate back to maxScale if gesture exceeded the maxScale specified
     if (_scale > maxScale) {
@@ -251,6 +257,12 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     addAnimateOnScaleStateUpdate(animateOnScaleStateUpdate);
 
     cachedScaleBoundaries = widget.scaleBoundaries;
+
+    _scaleAnimationController = AnimationController(vsync: this)
+      ..addListener(handleScaleAnimation)
+      ..addStatusListener(onAnimationStatus);
+    _positionAnimationController = AnimationController(vsync: this)
+      ..addListener(handlePositionAnimate);
   }
 
   void animateOnScaleStateUpdate(double prevScale, double nextScale) {

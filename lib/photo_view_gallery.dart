@@ -8,6 +8,7 @@ import 'package:photo_view/photo_view.dart'
         PhotoView,
         PhotoViewImageTapDownCallback,
         PhotoViewImageTapUpCallback,
+        PhotoViewImageScaleEndCallback,
         ScaleStateCycle;
 
 import 'package:photo_view/src/controller/photo_view_controller.dart';
@@ -105,6 +106,7 @@ class PhotoViewGallery extends StatefulWidget {
     required this.pageOptions,
     this.loadingBuilder,
     this.backgroundDecoration,
+    this.wantKeepAlive = false,
     this.gaplessPlayback = false,
     this.reverse = false,
     this.pageController,
@@ -114,6 +116,7 @@ class PhotoViewGallery extends StatefulWidget {
     this.scrollPhysics,
     this.scrollDirection = Axis.horizontal,
     this.customSize,
+    this.allowImplicitScrolling = false,
   })  : itemCount = null,
         builder = null,
         super(key: key);
@@ -127,6 +130,7 @@ class PhotoViewGallery extends StatefulWidget {
     required this.builder,
     this.loadingBuilder,
     this.backgroundDecoration,
+    this.wantKeepAlive = false,
     this.gaplessPlayback = false,
     this.reverse = false,
     this.pageController,
@@ -136,6 +140,7 @@ class PhotoViewGallery extends StatefulWidget {
     this.scrollPhysics,
     this.scrollDirection = Axis.horizontal,
     this.customSize,
+    this.allowImplicitScrolling = false,
   })  : pageOptions = null,
         assert(itemCount != null),
         assert(builder != null),
@@ -158,6 +163,9 @@ class PhotoViewGallery extends StatefulWidget {
 
   /// Mirror to [PhotoView.backgroundDecoration]
   final BoxDecoration? backgroundDecoration;
+
+  /// Mirror to [PhotoView.wantKeepAlive]
+  final bool wantKeepAlive;
 
   /// Mirror to [PhotoView.gaplessPlayback]
   final bool gaplessPlayback;
@@ -182,6 +190,9 @@ class PhotoViewGallery extends StatefulWidget {
 
   /// The axis along which the [PageView] scrolls. Mirror to [PageView.scrollDirection]
   final Axis scrollDirection;
+
+  /// When user attempts to move it to the next element, focus will traverse to the next page in the page view.
+  final bool allowImplicitScrolling;
 
   bool get _isBuilder => builder != null;
 
@@ -225,6 +236,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
         itemBuilder: _buildItem,
         scrollDirection: widget.scrollDirection,
         physics: widget.scrollPhysics,
+        allowImplicitScrolling: widget.allowImplicitScrolling,
       ),
     );
   }
@@ -239,6 +251,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             child: pageOption.child,
             childSize: pageOption.childSize,
             backgroundDecoration: widget.backgroundDecoration,
+            wantKeepAlive: widget.wantKeepAlive,
             controller: pageOption.controller,
             scaleStateController: pageOption.scaleStateController,
             customSize: widget.customSize,
@@ -251,6 +264,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             scaleStateCycle: pageOption.scaleStateCycle,
             onTapUp: pageOption.onTapUp,
             onTapDown: pageOption.onTapDown,
+            onScaleEnd: pageOption.onScaleEnd,
             gestureDetectorBehavior: pageOption.gestureDetectorBehavior,
             tightMode: pageOption.tightMode,
             filterQuality: pageOption.filterQuality,
@@ -262,6 +276,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             imageProvider: pageOption.imageProvider,
             loadingBuilder: widget.loadingBuilder,
             backgroundDecoration: widget.backgroundDecoration,
+            wantKeepAlive: widget.wantKeepAlive,
             controller: pageOption.controller,
             scaleStateController: pageOption.scaleStateController,
             customSize: widget.customSize,
@@ -275,6 +290,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             scaleStateCycle: pageOption.scaleStateCycle,
             onTapUp: pageOption.onTapUp,
             onTapDown: pageOption.onTapDown,
+            onScaleEnd: pageOption.onScaleEnd,
             gestureDetectorBehavior: pageOption.gestureDetectorBehavior,
             tightMode: pageOption.tightMode,
             filterQuality: pageOption.filterQuality,
@@ -315,6 +331,7 @@ class PhotoViewGalleryPageOptions {
     this.scaleStateCycle,
     this.onTapUp,
     this.onTapDown,
+    this.onScaleEnd,
     this.gestureDetectorBehavior,
     this.tightMode,
     this.filterQuality,
@@ -337,6 +354,7 @@ class PhotoViewGalleryPageOptions {
     this.scaleStateCycle,
     this.onTapUp,
     this.onTapDown,
+    this.onScaleEnd,
     this.gestureDetectorBehavior,
     this.tightMode,
     this.filterQuality,
@@ -382,6 +400,9 @@ class PhotoViewGalleryPageOptions {
 
   /// Mirror to [PhotoView.onTapDown]
   final PhotoViewImageTapDownCallback? onTapDown;
+
+  /// Mirror to [PhotoView.onScaleEnd]
+  final PhotoViewImageScaleEndCallback? onScaleEnd;
 
   /// Mirror to [PhotoView.gestureDetectorBehavior]
   final HitTestBehavior? gestureDetectorBehavior;
