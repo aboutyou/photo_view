@@ -15,6 +15,7 @@ class PhotoViewGestureDetector extends StatelessWidget {
     this.onTapUp,
     this.onTapDown,
     this.behavior,
+    required this.enabled,
   }) : super(key: key);
 
   final GestureDoubleTapCallback? onDoubleTap;
@@ -31,46 +32,49 @@ class PhotoViewGestureDetector extends StatelessWidget {
 
   final HitTestBehavior? behavior;
 
+  final bool enabled;
+
   @override
   Widget build(BuildContext context) {
     final scope = PhotoViewGestureDetectorScope.of(context);
 
     final Axis? axis = scope?.axis;
 
-    final Map<Type, GestureRecognizerFactory> gestures =
-        <Type, GestureRecognizerFactory>{};
+    final gestures = <Type, GestureRecognizerFactory>{};
 
-    if (onTapDown != null || onTapUp != null) {
-      gestures[TapGestureRecognizer] =
-          GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
-        () => TapGestureRecognizer(debugOwner: this),
-        (TapGestureRecognizer instance) {
+    if (enabled) {
+      if (onTapDown != null || onTapUp != null) {
+        gestures[TapGestureRecognizer] =
+            GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+          () => TapGestureRecognizer(debugOwner: this),
+          (TapGestureRecognizer instance) {
+            instance
+              ..onTapDown = onTapDown
+              ..onTapUp = onTapUp;
+          },
+        );
+      }
+
+      gestures[DoubleTapGestureRecognizer] =
+          GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
+        () => DoubleTapGestureRecognizer(debugOwner: this),
+        (DoubleTapGestureRecognizer instance) {
+          instance..onDoubleTap = onDoubleTap;
+        },
+      );
+
+      gestures[PhotoViewGestureRecognizer] =
+          GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
+        () => PhotoViewGestureRecognizer(
+            hitDetector: hitDetector, debugOwner: this, validateAxis: axis),
+        (PhotoViewGestureRecognizer instance) {
           instance
-            ..onTapDown = onTapDown
-            ..onTapUp = onTapUp;
+            ..onStart = onScaleStart
+            ..onUpdate = onScaleUpdate
+            ..onEnd = onScaleEnd;
         },
       );
     }
-
-    gestures[DoubleTapGestureRecognizer] =
-        GestureRecognizerFactoryWithHandlers<DoubleTapGestureRecognizer>(
-      () => DoubleTapGestureRecognizer(debugOwner: this),
-      (DoubleTapGestureRecognizer instance) {
-        instance..onDoubleTap = onDoubleTap;
-      },
-    );
-
-    gestures[PhotoViewGestureRecognizer] =
-        GestureRecognizerFactoryWithHandlers<PhotoViewGestureRecognizer>(
-      () => PhotoViewGestureRecognizer(
-          hitDetector: hitDetector, debugOwner: this, validateAxis: axis),
-      (PhotoViewGestureRecognizer instance) {
-        instance
-          ..onStart = onScaleStart
-          ..onUpdate = onScaleUpdate
-          ..onEnd = onScaleEnd;
-      },
-    );
 
     return RawGestureDetector(
       behavior: behavior,

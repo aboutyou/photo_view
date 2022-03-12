@@ -314,7 +314,8 @@ class PhotoViewCoreState extends State<PhotoViewCore>
               ..scale(computedScale)
               ..rotateZ(value.rotation);
 
-            final Widget customChildLayout = PhotoViewGestureDetector(
+            final customChildLayout = PhotoViewGestureDetector(
+              enabled: !widget.disableGestures,
               onDoubleTap: nextScaleState,
               onScaleStart: onScaleStart,
               onScaleUpdate: onScaleUpdate,
