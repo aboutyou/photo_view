@@ -2,6 +2,14 @@
 
 [![Tests status](https://img.shields.io/github/workflow/status/bluefireteam/photo_view/Test/master?label=tests)](https://github.com/bluefireteam/photo_view/actions) [![Pub](https://img.shields.io/pub/v/photo_view.svg?style=popout)](https://pub.dartlang.org/packages/photo_view) [![Chat](https://img.shields.io/discord/509714518008528896)](https://discord.gg/pxrBmy4)
 
+---
+
+The fork removes an unused double tap gesture which allows tapping on the background
+to instantly fire (instead of waiting for the double tap timeout) and thus makes it 
+a lot more responsive.
+
+---
+
 A simple zoomable image/content widget for Flutter.
 
 PhotoView enables images to become able to zoom and pan with user gestures such as pinch, rotate and drag.
