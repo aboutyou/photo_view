@@ -10,7 +10,6 @@ import 'package:photo_view/photo_view.dart'
         PhotoViewImageTapUpCallback,
         PhotoViewImageScaleEndCallback,
         ScaleStateCycle;
-
 import 'package:photo_view/src/controller/photo_view_controller.dart';
 import 'package:photo_view/src/controller/photo_view_scalestate_controller.dart';
 import 'package:photo_view/src/core/photo_view_gesture_detector.dart';
@@ -118,6 +117,8 @@ class PhotoViewGallery extends StatefulWidget {
     this.customSize,
     this.allowImplicitScrolling = false,
     this.padEnds = true,
+    this.pageSnapping = true,
+    this.clipBehavior = Clip.hardEdge,
   })  : itemCount = null,
         builder = null,
         super(key: key);
@@ -143,6 +144,8 @@ class PhotoViewGallery extends StatefulWidget {
     this.customSize,
     this.allowImplicitScrolling = false,
     this.padEnds = true,
+    this.pageSnapping = true,
+    this.clipBehavior = Clip.hardEdge,
   })  : pageOptions = null,
         assert(itemCount != null),
         assert(builder != null),
@@ -199,6 +202,18 @@ class PhotoViewGallery extends StatefulWidget {
   /// Whether to add padding to both ends of the list.
   final bool padEnds;
 
+  /// Set to false to disable page snapping, useful for custom scroll behavior.
+  ///
+  /// If the [padEnds] is false and [PageController.viewportFraction] < 1.0,
+  /// the page will snap to the beginning of the viewport; otherwise, the page
+  /// will snap to the center of the viewport.
+  final bool pageSnapping;
+
+  /// {@macro flutter.material.Material.clipBehavior}
+  ///
+  /// Defaults to [Clip.hardEdge].
+  final Clip clipBehavior;
+
   bool get _isBuilder => builder != null;
 
   @override
@@ -243,6 +258,8 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
         physics: widget.scrollPhysics,
         allowImplicitScrolling: widget.allowImplicitScrolling,
         padEnds: widget.padEnds,
+        pageSnapping: widget.pageSnapping,
+        clipBehavior: widget.clipBehavior,
       ),
     );
   }
