@@ -5,8 +5,7 @@ void main() => runApp(MyApp());
 
 ThemeData theme = ThemeData(
   primaryColor: Colors.black,
-  backgroundColor: Colors.white10,
-  fontFamily: 'PTSans',
+  fontFamily: 'PTSans', colorScheme: const ColorScheme(background: Colors.white10),
 );
 
 class MyApp extends StatelessWidget {
